@@ -48,7 +48,7 @@
 
     <!-- Footer -->
     <footer>
-        <span>📘 Sistem Jadwal Pelajaran - <strong>SMK LAB</strong> © {{ date('Y') }}</span>
+        <span>📘 Sistem Jadwal Pelajaran - <strong>Insanity Dzikriyana</strong> © {{ date('Y') }}</span>
     </footer>
 
     <script>

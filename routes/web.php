@@ -27,7 +27,11 @@ Route::get('/', function () {
 */
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // DASHBOARD
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD
+    |--------------------------------------------------------------------------
+    */
     Route::get('/dashboard', function () {
         $totalJadwal = Jadwal::count();
         $totalHari = Jadwal::distinct('hari')->count('hari');
@@ -36,19 +40,28 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ? Jadwal::distinct('nama_guru')->count('nama_guru')
             : (Schema::hasColumn('jadwals', 'guru') ? Jadwal::distinct('guru')->count('guru') : 0);
 
-        $totalMapel = Schema::hasColumn('jadwals', 'mapel')
-            ? Jadwal::distinct('mapel')->count('mapel')
+        // ✅ FIX: gunakan kolom 'pelajaran' bukan 'mapel'
+        $totalMapel = Schema::hasColumn('jadwals', 'pelajaran')
+            ? Jadwal::distinct('pelajaran')->count('pelajaran')
             : 0;
 
         return view('admin.dashboard', compact('totalJadwal', 'totalGuru', 'totalHari', 'totalMapel'));
     })->name('dashboard');
 
-    // DAFTAR GURU
+    /*
+    |--------------------------------------------------------------------------
+    | DAFTAR GURU
+    |--------------------------------------------------------------------------
+    */
     Route::get('/guru', function () {
         if (Schema::hasColumn('jadwals', 'nama_guru')) {
-            $daftarGuru = Jadwal::select('nama_guru', 'mapel', 'foto_guru', 'hari')->distinct('nama_guru')->get();
+            $daftarGuru = Jadwal::select('nama_guru', 'pelajaran as mapel', 'foto_guru', 'hari')
+                ->distinct('nama_guru')
+                ->get();
         } elseif (Schema::hasColumn('jadwals', 'guru')) {
-            $daftarGuru = Jadwal::select('guru as nama_guru', 'mapel', 'foto_guru', 'hari')->distinct('guru')->get();
+            $daftarGuru = Jadwal::select('guru as nama_guru', 'pelajaran as mapel', 'foto_guru', 'hari')
+                ->distinct('guru')
+                ->get();
         } else {
             $daftarGuru = collect();
         }
@@ -56,18 +69,24 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return view('admin.guru', compact('daftarGuru'));
     })->name('guru');
 
-    // DAFTAR MAPEL
+    /*
+    |--------------------------------------------------------------------------
+    | DAFTAR MATA PELAJARAN
+    |--------------------------------------------------------------------------
+    */
     Route::get('/mapel', function () {
-        $daftarMapel = Jadwal::select('mapel', 'nama_guru', 'hari', 'jam_masuk', 'jam_keluar')
-            ->distinct('mapel')
-            ->orderBy('mapel', 'asc')
+        // ✅ Ambil data dari kolom 'pelajaran'
+        $daftarMapel = Jadwal::select('pelajaran as mapel', 'nama_guru', 'hari', 'jam_masuk', 'jam_keluar')
+            ->distinct('pelajaran')
+            ->orderBy('pelajaran', 'asc')
             ->get();
 
         return view('admin.mapel', compact('daftarMapel'));
     })->name('mapel');
 
+    // Detail mapel untuk modal (AJAX)
     Route::get('/mapel/{mapel}', function ($mapel) {
-        $detailMapel = Jadwal::where('mapel', $mapel)
+        $detailMapel = Jadwal::where('pelajaran', $mapel)
             ->select('nama_guru', 'hari', 'jam_masuk', 'jam_keluar', 'ruang', 'foto_guru')
             ->get();
         return response()->json($detailMapel);
@@ -75,19 +94,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | FILTER JADWAL PER HARI (HARUS DI ATAS RESOURCE!)
+    | JADWAL (INDEX & CRUD)
     |--------------------------------------------------------------------------
     */
-    Route::get('/jadwal/hari/{hari}', function ($hari) {
-        $hari = strtolower($hari);
-        $jadwalHari = Jadwal::where('hari', $hari)->get();
-        return view('admin.jadwal.perhari', compact('hari', 'jadwalHari'));
-    })->name('jadwal.hari');
+    Route::get('/jadwal', [JadwalController::class, 'index'])->name('jadwal.index'); // semua jadwal
+    Route::get('/jadwal/hari/{hari}', [JadwalController::class, 'index'])->name('jadwal.hari'); // filter per hari
 
-    /*
-    |--------------------------------------------------------------------------
-    | CRUD JADWAL
-    |--------------------------------------------------------------------------
-    */
-    Route::resource('jadwal', JadwalController::class);
+    // CRUD
+    Route::get('/jadwal/create', [JadwalController::class, 'create'])->name('jadwal.create');
+    Route::post('/jadwal', [JadwalController::class, 'store'])->name('jadwal.store');
+    Route::get('/jadwal/{id}/edit', [JadwalController::class, 'edit'])->name('jadwal.edit');
+    Route::put('/jadwal/{id}', [JadwalController::class, 'update'])->name('jadwal.update');
+    Route::delete('/jadwal/{id}', [JadwalController::class, 'destroy'])->name('jadwal.destroy');
 });

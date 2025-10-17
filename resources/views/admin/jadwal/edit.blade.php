@@ -35,8 +35,8 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-semibold">Mata Pelajaran</label>
-                    <input type="text" name="mapel" 
-                           value="{{ old('mapel', $jadwal->mapel) }}" 
+                    <input type="text" name="pelajaran" 
+                           value="{{ old('pelajaran', $jadwal->pelajaran) }}" 
                            class="form-control" placeholder="Masukkan mata pelajaran" required>
                 </div>
 
