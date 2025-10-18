@@ -10,18 +10,28 @@
 </head>
 
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h4 class="text-center mb-4 bi-nut">Admin Jadwal</h4>
-        <hr>
+  <!-- Sidebar -->
+<div class="sidebar">
+    <h4 class="text-center mb-4 bi-nut">Admin Jadwal</h4>
+    <hr>
 
-        <a href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
-        <a href="{{ route('admin.guru') }}"><i class="bi bi-person-badge"></i> Daftar Guru</a>
-        <a href="{{ route('admin.mapel') }}"><i class="bi bi-journal-bookmark"></i> Daftar Mapel</a>
-        <a href="{{ route('admin.jadwal.index') }}"><i class="bi bi-calendar3"></i> Kelola Jadwal</a>
+    <a href="{{ route('admin.dashboard') }}"><i class="bi bi-house"></i> Dashboard</a>
+    <a href="{{ route('admin.guru') }}"><i class="bi bi-person-badge"></i> Daftar Guru</a>
+    <a href="{{ route('admin.mapel') }}"><i class="bi bi-journal-bookmark"></i> Daftar Mapel</a>
 
-        <hr>
-        <!-- Link Hari Mengarah ke Route Filter Hari -->
+    <!-- Tombol collapse untuk Kelola Jadwal -->
+    <a class="d-flex justify-content-between align-items-center" 
+       data-bs-toggle="collapse" 
+       href="#jadwalSubmenu" 
+       role="button" 
+       aria-expanded="false" 
+       aria-controls="jadwalSubmenu">
+        <span><i class="bi bi-calendar3"></i> Kelola Jadwal</span>
+        <i class="bi bi-caret-down-fill small"></i>
+    </a>
+
+    <!-- Submenu Hari -->
+    <div class="collapse ps-4 mt-1" id="jadwalSubmenu">
         <a href="{{ route('admin.jadwal.hari', 'senin') }}"><i class="bi bi-calendar-week"></i> Senin</a>
         <a href="{{ route('admin.jadwal.hari', 'selasa') }}"><i class="bi bi-calendar-week"></i> Selasa</a>
         <a href="{{ route('admin.jadwal.hari', 'rabu') }}"><i class="bi bi-calendar-week"></i> Rabu</a>
@@ -29,6 +39,10 @@
         <a href="{{ route('admin.jadwal.hari', 'jumat') }}"><i class="bi bi-calendar-week"></i> Jumat</a>
         <a href="{{ route('admin.jadwal.hari', 'sabtu') }}"><i class="bi bi-calendar-week"></i> Sabtu</a>
     </div>
+
+    <hr>
+</div>
+
 
     <!-- Navbar -->
     <nav class="navbar navbar-light px-4 d-flex justify-content-between align-items-center">
@@ -46,16 +60,29 @@
         @yield('content')
     </div>
 
-    <!-- Footer -->
+       <!-- Footer -->
     <footer>
         <span>📘 Sistem Jadwal Pelajaran - <strong>Insanity Dzikriyana</strong> © {{ date('Y') }}</span>
     </footer>
 
+    <!-- Bootstrap JS (Wajib untuk modal, dropdown, dan alert) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script tambahan -->
     <script>
-        // Sidebar toggle for mobile
+        // Sidebar toggle untuk mobile
         document.querySelector('.toggle-sidebar')?.addEventListener('click', () => {
             document.querySelector('.sidebar').classList.toggle('active');
         });
+
+        // Auto-close alert sukses setelah 3 detik
+        setTimeout(() => {
+            const alert = document.querySelector('.alert');
+            if (alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
+        }, 3000);
     </script>
 </body>
 </html>

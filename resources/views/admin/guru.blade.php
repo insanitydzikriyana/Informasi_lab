@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold text-dark">👩‍🏫 Daftar Guru Aktif</h3>
+        <h3 class="fw-bold text-dark bi-person-workspace"> Daftar Guru Aktif</h3>
         <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">← Kembali ke Dashboard</a>
     </div>
 

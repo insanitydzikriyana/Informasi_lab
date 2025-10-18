@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="card shadow-sm">
-    <div class="card-header bg-success text-white">
+    <div class="card-header bg-primary text-white">
         <h5 class="mb-0">Tambah Jadwal Baru</h5>
     </div>
 

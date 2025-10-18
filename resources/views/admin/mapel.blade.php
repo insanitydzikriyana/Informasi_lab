@@ -14,7 +14,7 @@
             <div class="col-md-4 mb-4">
                 <div class="card shadow-lg border-0 p-3 text-center mapel-card"
                      data-mapel="{{ $mapel->mapel }}"
-                     style="border-radius: 15px; background: linear-gradient(145deg, #ffffff, #e6e6e6);
+                     style="border-radius: 20px; background: linear-gradient(145deg, #ffffff, #e6e6e6);
                             transition: all 0.3s ease; transform-style: preserve-3d; cursor: pointer;">
                     <div class="card-body">
                         <div class="mb-3">
@@ -39,7 +39,7 @@
 <!-- Modal Detail Mapel -->
 <div class="modal fade" id="mapelModal" tabindex="-1" aria-labelledby="mapelModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content shadow-lg rounded-4 border-0">
+    <div class="modal-content shadow-lg rounded-4 border-0" style="overflow: hidden;">
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title fw-bold" id="mapelModalLabel">Detail Mata Pelajaran</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -52,14 +52,36 @@
 </div>
 
 <style>
-.card:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+/* --- Efek 3D Kartu Mapel --- */
+.mapel-card {
+    border-radius: 18px;
+    background: linear-gradient(145deg, #ffffff, #dfe3e6);
+    box-shadow: 6px 6px 15px #c5c5c5, -6px -6px 15px #ffffff;
+    transition: all 0.3s ease;
 }
 .mapel-card:hover {
-    transform: translateY(-6px) scale(1.03);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(145deg, #f9fafb, #e6e6e6);
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 10px 10px 20px rgba(0,0,0,0.2);
+    background: linear-gradient(145deg, #f5f9ff, #e8ecf2);
+}
+
+/* --- Modal Table --- */
+.table th {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+    text-align: center;
+}
+.table td {
+    vertical-align: middle;
+    text-align: center;
+}
+.modal-body img {
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.3s;
+}
+.modal-body img:hover {
+    transform: scale(1.05);
 }
 </style>
 
@@ -78,20 +100,30 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.show();
 
             try {
-                const response = await fetch(`/admin/mapel/${mapel}`);
+                const response = await fetch(`/admin/mapel/${encodeURIComponent(mapel)}`);
                 const data = await response.json();
 
-                if (data.length === 0) {
+                if (!data || data.length === 0) {
                     modalBody.innerHTML = `<p class="text-center text-danger">Tidak ada data jadwal untuk mapel ini.</p>`;
                     return;
                 }
 
+                // Ambil foto guru pertama kalau ada
+                const foto = data[0].foto_guru 
+                    ? `/storage/${data[0].foto_guru}` 
+                    : 'https://via.placeholder.com/120x120?text=No+Photo';
+
                 let html = `
+                    <div class="text-center mb-4">
+                        <img src="${foto}" alt="Foto Guru" width="120" height="120">
+                        <h5 class="mt-3 fw-bold">${mapel}</h5>
+                        <p class="text-muted mb-0">${data[0].nama_guru ?? 'Guru tidak diketahui'}</p>
+                    </div>
+
                     <div class="table-responsive">
-                        <table class="table table-striped align-middle">
-                            <thead class="table-primary">
+                        <table class="table table-bordered table-hover align-middle rounded-3 overflow-hidden">
+                            <thead>
                                 <tr>
-                                    <th>Guru</th>
                                     <th>Hari</th>
                                     <th>Jam Masuk</th>
                                     <th>Jam Keluar</th>
@@ -104,7 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.forEach(item => {
                     html += `
                         <tr>
-                            <td>${item.nama_guru ?? '-'}</td>
                             <td>${item.hari ? item.hari.charAt(0).toUpperCase() + item.hari.slice(1) : '-'}</td>
                             <td>${item.jam_masuk ?? '-'}</td>
                             <td>${item.jam_keluar ?? '-'}</td>
